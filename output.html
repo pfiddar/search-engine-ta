@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/style.css') }}" />
   </head>
   <body class="font-sans">
     <div class="">
@@ -129,7 +129,7 @@
           <li>
             <a
               class="text-base font-bold text-[#eaad1e] border-b-4 rounded-sm border-transparent hover:border-[#004b8f] transition pb-1"
-              href="search.html"
+              href="{{ url_for('search_ta') }}"
               >Pencarian Penelitian</a
             >
           </li>
@@ -162,13 +162,13 @@
         <div class="w-full h-20 flex justify-between items-center">
           <div class="">
             <img
-              src="assets/images/logo.png"
+              src="{{ url_for('static', filename='assets/images/logo.png') }}"
               alt=""
               class="h-14 w-14 object-contain"
             />
           </div>
           <div class="flex-grow ml-2">
-            <form class="flex items-center mx-auto">
+            <form class="flex items-center mx-auto" action="{{ url_for('hasil_search_ta') }}" method="post">
               <label for="simple-search" class="sr-only">Search</label>
               <div class="relative w-full">
                 <div
@@ -177,6 +177,7 @@
                 <input
                   type="text"
                   id="simple-search"
+                  name="judul"
                   class="w-full h-12 bg-[#D9D9D9] border font-semibold text-sm rounded-full focus:outline-none block p-2.5"
                   placeholder="Pencarian Judul Penelitian"
                   required
@@ -197,471 +198,48 @@
       <h2 class="px-4 font-bold text-lg text-[#EAAD1E] tracking-wide">
         Hasil Pencarian :
         <span class="text-black"
-          >Ditemukan <span class="text-[#EAAD1E]">30</span> dokumen yang sesuai
+          >Ditemukan <span class="text-[#EAAD1E]">{{ jumlah_baris }}</span> dokumen yang sesuai
           dengan query</span
         >
       </h2>
       <div class="px-36 py-2">
         <div class=""></div>
         <div class="mt-2 flex flex-col">
-          <div
-            class="border-b-2 border-[#EAAD1E] rounded-sm py-8 flex gap-8 flex-col max-w-full"
-          >
+          {% for row in result_searching %}
+          <div class="border-b-2 border-[#EAAD1E] rounded-sm py-8 flex gap-8 flex-col max-w-full">
             <div class="flex gap-4">
-              <img src="assets/images/image.png" alt="Gambar" class="w-28" />
+              <img src="{{ url_for('static', filename='assets/images/image.png') }}" alt="Gambar" class="w-28" />
               <div class="">
-                <h1
-                  class="hover:cursor-pointer underline hover:text-black hover:no-underline text-lg font-extrabold text-[#004B8F]"
-                >
-                  <a href="detail.html">
-                    klasifikasi penyakit stroke menggunakan algoritma knn dengan
-                    optimasi teknik bagging</a
-                  >
+                <h1 class="hover:cursor-pointer underline hover:text-black hover:no-underline text-lg font-extrabold text-[#004B8F]">
+                  {{ row.judul }}
                 </h1>
                 <p class="line-clamp-4">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Quibusdam, quo fugiat explicabo incidunt commodi, corrupti
-                  maxime facilis iste obcaecati exercitationem vel facere magnam
-                  doloremque libero, voluptas atque sed aspernatur blanditiis.
-                  Cum sit debitis, dolorum obcaecati accusantium officiis
-                  sapiente labore veritatis possimus incidunt quasi magni
-                  explicabo. Corporis magni alias iure sint, sapiente vel ipsa
-                  doloribus. Labore alias laboriosam sapiente molestiae harum
-                  ullam architecto fugit in suscipit sit! Repellendus architecto
-                  ratione dignissimos impedit. In consectetur reprehenderit
-                  similique ipsum hic eos quibusdam beatae dignissimos eum.
-                  Repellendus illo voluptas quo eius alias, ducimus veritatis
-                  perspiciatis voluptates consequuntur nobis cumque ipsa
-                  voluptatum enim vitae rem modi omnis. Perferendis nesciunt
-                  omnis non totam. Ipsa velit dolore exercitationem iste quia,
-                  laboriosam aperiam maxime iure porro doloribus minus odio
-                  assumenda, cupiditate possimus dicta, fugiat consequuntur
-                  animi delectus! Minus eaque esse, omnis velit rerum alias
-                  dolores doloremque obcaecati voluptatem fugit voluptate vero
-                  eligendi quasi accusantium ea. Sed reprehenderit molestias
-                  autem nam tenetur magnam consequatur voluptatum enim dolores
-                  earum inventore quaerat temporibus molestiae magni, ea et quae
-                  ducimus suscipit tempora dolorem non maxime unde?
-                  Necessitatibus ullam eum praesentium iure eius ex quaerat,
-                  maxime soluta vel aliquid. Animi exercitationem nisi ducimus,
-                  asperiores, modi totam, numquam saepe quae ab placeat vitae
-                  inventore!
+                  {{ row.deskripsi }}
                 </p>
               </div>
             </div>
             <div class="flex justify-between">
               <p class="text-[#EAAD1E] font-semibold">
                 Kata Kunci:
-                <span class="text-black">
-                  classification, bagging, k-nearest neighbor (knn).</span
-                >
+                <span class="text-black">{{ row.kata_kunci }}</span>
               </p>
               <p class="text-[#EAAD1E] font-semibold">
-                Tahun: <span class="text-black">2023</span>
+                Tahun: <span class="text-black">{{ row.tahun }}</span>
               </p>
             </div>
           </div>
-          <div
-            class="border-b-2 border-[#EAAD1E] rounded-sm py-8 flex gap-8 flex-col max-w-full"
-          >
-            <div class="flex gap-4">
-              <img src="assets/images/image.png" alt="Gambar" class="w-28" />
-              <div class="">
-                <h1
-                  class="hover:cursor-pointer underline hover:text-black hover:no-underline text-lg font-extrabold text-[#004B8F]"
-                >
-                  <a href="detail.html">
-                    klasifikasi penyakit stroke menggunakan algoritma knn dengan
-                    optimasi teknik bagging</a
-                  >
-                </h1>
-                <p class="line-clamp-4">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Quibusdam, quo fugiat explicabo incidunt commodi, corrupti
-                  maxime facilis iste obcaecati exercitationem vel facere magnam
-                  doloremque libero, voluptas atque sed aspernatur blanditiis.
-                  Cum sit debitis, dolorum obcaecati accusantium officiis
-                  sapiente labore veritatis possimus incidunt quasi magni
-                  explicabo. Corporis magni alias iure sint, sapiente vel ipsa
-                  doloribus. Labore alias laboriosam sapiente molestiae harum
-                  ullam architecto fugit in suscipit sit! Repellendus architecto
-                  ratione dignissimos impedit. In consectetur reprehenderit
-                  similique ipsum hic eos quibusdam beatae dignissimos eum.
-                  Repellendus illo voluptas quo eius alias, ducimus veritatis
-                  perspiciatis voluptates consequuntur nobis cumque ipsa
-                  voluptatum enim vitae rem modi omnis. Perferendis nesciunt
-                  omnis non totam. Ipsa velit dolore exercitationem iste quia,
-                  laboriosam aperiam maxime iure porro doloribus minus odio
-                  assumenda, cupiditate possimus dicta, fugiat consequuntur
-                  animi delectus! Minus eaque esse, omnis velit rerum alias
-                  dolores doloremque obcaecati voluptatem fugit voluptate vero
-                  eligendi quasi accusantium ea. Sed reprehenderit molestias
-                  autem nam tenetur magnam consequatur voluptatum enim dolores
-                  earum inventore quaerat temporibus molestiae magni, ea et quae
-                  ducimus suscipit tempora dolorem non maxime unde?
-                  Necessitatibus ullam eum praesentium iure eius ex quaerat,
-                  maxime soluta vel aliquid. Animi exercitationem nisi ducimus,
-                  asperiores, modi totam, numquam saepe quae ab placeat vitae
-                  inventore!
-                </p>
-              </div>
-            </div>
-            <div class="flex justify-between">
-              <p class="text-[#EAAD1E] font-semibold">
-                Kata Kunci:
-                <span class="text-black">
-                  classification, bagging, k-nearest neighbor (knn).</span
-                >
-              </p>
-              <p class="text-[#EAAD1E] font-semibold">
-                Tahun: <span class="text-black">2023</span>
-              </p>
-            </div>
-          </div>
-          <div
-            class="border-b-2 border-[#EAAD1E] rounded-sm py-8 flex gap-8 flex-col max-w-full"
-          >
-            <div class="flex gap-4">
-              <img src="assets/images/image.png" alt="Gambar" class="w-28" />
-              <div class="">
-                <h1
-                  class="hover:cursor-pointer underline hover:text-black hover:no-underline text-lg font-extrabold text-[#004B8F]"
-                >
-                  <a href="detail.html">
-                    klasifikasi penyakit stroke menggunakan algoritma knn dengan
-                    optimasi teknik bagging</a
-                  >
-                </h1>
-                <p class="line-clamp-4">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Quibusdam, quo fugiat explicabo incidunt commodi, corrupti
-                  maxime facilis iste obcaecati exercitationem vel facere magnam
-                  doloremque libero, voluptas atque sed aspernatur blanditiis.
-                  Cum sit debitis, dolorum obcaecati accusantium officiis
-                  sapiente labore veritatis possimus incidunt quasi magni
-                  explicabo. Corporis magni alias iure sint, sapiente vel ipsa
-                  doloribus. Labore alias laboriosam sapiente molestiae harum
-                  ullam architecto fugit in suscipit sit! Repellendus architecto
-                  ratione dignissimos impedit. In consectetur reprehenderit
-                  similique ipsum hic eos quibusdam beatae dignissimos eum.
-                  Repellendus illo voluptas quo eius alias, ducimus veritatis
-                  perspiciatis voluptates consequuntur nobis cumque ipsa
-                  voluptatum enim vitae rem modi omnis. Perferendis nesciunt
-                  omnis non totam. Ipsa velit dolore exercitationem iste quia,
-                  laboriosam aperiam maxime iure porro doloribus minus odio
-                  assumenda, cupiditate possimus dicta, fugiat consequuntur
-                  animi delectus! Minus eaque esse, omnis velit rerum alias
-                  dolores doloremque obcaecati voluptatem fugit voluptate vero
-                  eligendi quasi accusantium ea. Sed reprehenderit molestias
-                  autem nam tenetur magnam consequatur voluptatum enim dolores
-                  earum inventore quaerat temporibus molestiae magni, ea et quae
-                  ducimus suscipit tempora dolorem non maxime unde?
-                  Necessitatibus ullam eum praesentium iure eius ex quaerat,
-                  maxime soluta vel aliquid. Animi exercitationem nisi ducimus,
-                  asperiores, modi totam, numquam saepe quae ab placeat vitae
-                  inventore!
-                </p>
-              </div>
-            </div>
-            <div class="flex justify-between">
-              <p class="text-[#EAAD1E] font-semibold">
-                Kata Kunci:
-                <span class="text-black">
-                  classification, bagging, k-nearest neighbor (knn).</span
-                >
-              </p>
-              <p class="text-[#EAAD1E] font-semibold">
-                Tahun: <span class="text-black">2023</span>
-              </p>
-            </div>
-          </div>
-          <div
-            class="border-b-2 border-[#EAAD1E] rounded-sm py-8 flex gap-8 flex-col max-w-full"
-          >
-            <div class="flex gap-4">
-              <img src="assets/images/image.png" alt="Gambar" class="w-28" />
-              <div class="">
-                <h1
-                  class="hover:cursor-pointer underline hover:text-black hover:no-underline text-lg font-extrabold text-[#004B8F]"
-                >
-                  <a href="detail.html">
-                    klasifikasi penyakit stroke menggunakan algoritma knn dengan
-                    optimasi teknik bagging</a
-                  >
-                </h1>
-                <p class="line-clamp-4">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Quibusdam, quo fugiat explicabo incidunt commodi, corrupti
-                  maxime facilis iste obcaecati exercitationem vel facere magnam
-                  doloremque libero, voluptas atque sed aspernatur blanditiis.
-                  Cum sit debitis, dolorum obcaecati accusantium officiis
-                  sapiente labore veritatis possimus incidunt quasi magni
-                  explicabo. Corporis magni alias iure sint, sapiente vel ipsa
-                  doloribus. Labore alias laboriosam sapiente molestiae harum
-                  ullam architecto fugit in suscipit sit! Repellendus architecto
-                  ratione dignissimos impedit. In consectetur reprehenderit
-                  similique ipsum hic eos quibusdam beatae dignissimos eum.
-                  Repellendus illo voluptas quo eius alias, ducimus veritatis
-                  perspiciatis voluptates consequuntur nobis cumque ipsa
-                  voluptatum enim vitae rem modi omnis. Perferendis nesciunt
-                  omnis non totam. Ipsa velit dolore exercitationem iste quia,
-                  laboriosam aperiam maxime iure porro doloribus minus odio
-                  assumenda, cupiditate possimus dicta, fugiat consequuntur
-                  animi delectus! Minus eaque esse, omnis velit rerum alias
-                  dolores doloremque obcaecati voluptatem fugit voluptate vero
-                  eligendi quasi accusantium ea. Sed reprehenderit molestias
-                  autem nam tenetur magnam consequatur voluptatum enim dolores
-                  earum inventore quaerat temporibus molestiae magni, ea et quae
-                  ducimus suscipit tempora dolorem non maxime unde?
-                  Necessitatibus ullam eum praesentium iure eius ex quaerat,
-                  maxime soluta vel aliquid. Animi exercitationem nisi ducimus,
-                  asperiores, modi totam, numquam saepe quae ab placeat vitae
-                  inventore!
-                </p>
-              </div>
-            </div>
-            <div class="flex justify-between">
-              <p class="text-[#EAAD1E] font-semibold">
-                Kata Kunci:
-                <span class="text-black">
-                  classification, bagging, k-nearest neighbor (knn).</span
-                >
-              </p>
-              <p class="text-[#EAAD1E] font-semibold">
-                Tahun: <span class="text-black">2023</span>
-              </p>
-            </div>
-          </div>
-          <div
-            class="border-b-2 border-[#EAAD1E] rounded-sm py-8 flex gap-8 flex-col max-w-full"
-          >
-            <div class="flex gap-4">
-              <img src="assets/images/image.png" alt="Gambar" class="w-28" />
-              <div class="">
-                <h1
-                  class="hover:cursor-pointer underline hover:text-black hover:no-underline text-lg font-extrabold text-[#004B8F]"
-                >
-                  <a href="detail.html">
-                    klasifikasi penyakit stroke menggunakan algoritma knn dengan
-                    optimasi teknik bagging</a
-                  >
-                </h1>
-                <p class="line-clamp-4">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Quibusdam, quo fugiat explicabo incidunt commodi, corrupti
-                  maxime facilis iste obcaecati exercitationem vel facere magnam
-                  doloremque libero, voluptas atque sed aspernatur blanditiis.
-                  Cum sit debitis, dolorum obcaecati accusantium officiis
-                  sapiente labore veritatis possimus incidunt quasi magni
-                  explicabo. Corporis magni alias iure sint, sapiente vel ipsa
-                  doloribus. Labore alias laboriosam sapiente molestiae harum
-                  ullam architecto fugit in suscipit sit! Repellendus architecto
-                  ratione dignissimos impedit. In consectetur reprehenderit
-                  similique ipsum hic eos quibusdam beatae dignissimos eum.
-                  Repellendus illo voluptas quo eius alias, ducimus veritatis
-                  perspiciatis voluptates consequuntur nobis cumque ipsa
-                  voluptatum enim vitae rem modi omnis. Perferendis nesciunt
-                  omnis non totam. Ipsa velit dolore exercitationem iste quia,
-                  laboriosam aperiam maxime iure porro doloribus minus odio
-                  assumenda, cupiditate possimus dicta, fugiat consequuntur
-                  animi delectus! Minus eaque esse, omnis velit rerum alias
-                  dolores doloremque obcaecati voluptatem fugit voluptate vero
-                  eligendi quasi accusantium ea. Sed reprehenderit molestias
-                  autem nam tenetur magnam consequatur voluptatum enim dolores
-                  earum inventore quaerat temporibus molestiae magni, ea et quae
-                  ducimus suscipit tempora dolorem non maxime unde?
-                  Necessitatibus ullam eum praesentium iure eius ex quaerat,
-                  maxime soluta vel aliquid. Animi exercitationem nisi ducimus,
-                  asperiores, modi totam, numquam saepe quae ab placeat vitae
-                  inventore!
-                </p>
-              </div>
-            </div>
-            <div class="flex justify-between">
-              <p class="text-[#EAAD1E] font-semibold">
-                Kata Kunci:
-                <span class="text-black">
-                  classification, bagging, k-nearest neighbor (knn).</span
-                >
-              </p>
-              <p class="text-[#EAAD1E] font-semibold">
-                Tahun: <span class="text-black">2023</span>
-              </p>
-            </div>
-          </div>
-          <div
-            class="border-b-2 border-[#EAAD1E] rounded-sm py-8 flex gap-8 flex-col max-w-full"
-          >
-            <div class="flex gap-4">
-              <img src="assets/images/image.png" alt="Gambar" class="w-28" />
-              <div class="">
-                <h1
-                  class="hover:cursor-pointer underline hover:text-black hover:no-underline text-lg font-extrabold text-[#004B8F]"
-                >
-                  <a href="detail.html">
-                    klasifikasi penyakit stroke menggunakan algoritma knn dengan
-                    optimasi teknik bagging</a
-                  >
-                </h1>
-                <p class="line-clamp-4">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Quibusdam, quo fugiat explicabo incidunt commodi, corrupti
-                  maxime facilis iste obcaecati exercitationem vel facere magnam
-                  doloremque libero, voluptas atque sed aspernatur blanditiis.
-                  Cum sit debitis, dolorum obcaecati accusantium officiis
-                  sapiente labore veritatis possimus incidunt quasi magni
-                  explicabo. Corporis magni alias iure sint, sapiente vel ipsa
-                  doloribus. Labore alias laboriosam sapiente molestiae harum
-                  ullam architecto fugit in suscipit sit! Repellendus architecto
-                  ratione dignissimos impedit. In consectetur reprehenderit
-                  similique ipsum hic eos quibusdam beatae dignissimos eum.
-                  Repellendus illo voluptas quo eius alias, ducimus veritatis
-                  perspiciatis voluptates consequuntur nobis cumque ipsa
-                  voluptatum enim vitae rem modi omnis. Perferendis nesciunt
-                  omnis non totam. Ipsa velit dolore exercitationem iste quia,
-                  laboriosam aperiam maxime iure porro doloribus minus odio
-                  assumenda, cupiditate possimus dicta, fugiat consequuntur
-                  animi delectus! Minus eaque esse, omnis velit rerum alias
-                  dolores doloremque obcaecati voluptatem fugit voluptate vero
-                  eligendi quasi accusantium ea. Sed reprehenderit molestias
-                  autem nam tenetur magnam consequatur voluptatum enim dolores
-                  earum inventore quaerat temporibus molestiae magni, ea et quae
-                  ducimus suscipit tempora dolorem non maxime unde?
-                  Necessitatibus ullam eum praesentium iure eius ex quaerat,
-                  maxime soluta vel aliquid. Animi exercitationem nisi ducimus,
-                  asperiores, modi totam, numquam saepe quae ab placeat vitae
-                  inventore!
-                </p>
-              </div>
-            </div>
-            <div class="flex justify-between">
-              <p class="text-[#EAAD1E] font-semibold">
-                Kata Kunci:
-                <span class="text-black">
-                  classification, bagging, k-nearest neighbor (knn).</span
-                >
-              </p>
-              <p class="text-[#EAAD1E] font-semibold">
-                Tahun: <span class="text-black">2023</span>
-              </p>
-            </div>
-          </div>
-          <div
-            class="border-b-2 border-[#EAAD1E] rounded-sm py-8 flex gap-8 flex-col max-w-full"
-          >
-            <div class="flex gap-4">
-              <img src="assets/images/image.png" alt="Gambar" class="w-28" />
-              <div class="">
-                <h1
-                  class="hover:cursor-pointer underline hover:text-black hover:no-underline text-lg font-extrabold text-[#004B8F]"
-                >
-                  <a href="detail.html">
-                    klasifikasi penyakit stroke menggunakan algoritma knn dengan
-                    optimasi teknik bagging</a
-                  >
-                </h1>
-                <p class="line-clamp-4">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Quibusdam, quo fugiat explicabo incidunt commodi, corrupti
-                  maxime facilis iste obcaecati exercitationem vel facere magnam
-                  doloremque libero, voluptas atque sed aspernatur blanditiis.
-                  Cum sit debitis, dolorum obcaecati accusantium officiis
-                  sapiente labore veritatis possimus incidunt quasi magni
-                  explicabo. Corporis magni alias iure sint, sapiente vel ipsa
-                  doloribus. Labore alias laboriosam sapiente molestiae harum
-                  ullam architecto fugit in suscipit sit! Repellendus architecto
-                  ratione dignissimos impedit. In consectetur reprehenderit
-                  similique ipsum hic eos quibusdam beatae dignissimos eum.
-                  Repellendus illo voluptas quo eius alias, ducimus veritatis
-                  perspiciatis voluptates consequuntur nobis cumque ipsa
-                  voluptatum enim vitae rem modi omnis. Perferendis nesciunt
-                  omnis non totam. Ipsa velit dolore exercitationem iste quia,
-                  laboriosam aperiam maxime iure porro doloribus minus odio
-                  assumenda, cupiditate possimus dicta, fugiat consequuntur
-                  animi delectus! Minus eaque esse, omnis velit rerum alias
-                  dolores doloremque obcaecati voluptatem fugit voluptate vero
-                  eligendi quasi accusantium ea. Sed reprehenderit molestias
-                  autem nam tenetur magnam consequatur voluptatum enim dolores
-                  earum inventore quaerat temporibus molestiae magni, ea et quae
-                  ducimus suscipit tempora dolorem non maxime unde?
-                  Necessitatibus ullam eum praesentium iure eius ex quaerat,
-                  maxime soluta vel aliquid. Animi exercitationem nisi ducimus,
-                  asperiores, modi totam, numquam saepe quae ab placeat vitae
-                  inventore!
-                </p>
-              </div>
-            </div>
-            <div class="flex justify-between">
-              <p class="text-[#EAAD1E] font-semibold">
-                Kata Kunci:
-                <span class="text-black">
-                  classification, bagging, k-nearest neighbor (knn).</span
-                >
-              </p>
-              <p class="text-[#EAAD1E] font-semibold">
-                Tahun: <span class="text-black">2023</span>
-              </p>
-            </div>
-          </div>
-          <div
-            class="border-b-2 border-[#EAAD1E] rounded-sm py-8 flex gap-8 flex-col max-w-full"
-          >
-            <div class="flex gap-4">
-              <img src="assets/images/image.png" alt="Gambar" class="w-28" />
-              <div class="">
-                <h1
-                  class="hover:cursor-pointer underline hover:text-black hover:no-underline text-lg font-extrabold text-[#004B8F]"
-                >
-                  <a href="detail.html">
-                    klasifikasi penyakit stroke menggunakan algoritma knn dengan
-                    optimasi teknik bagging</a
-                  >
-                </h1>
-                <p class="line-clamp-4">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Quibusdam, quo fugiat explicabo incidunt commodi, corrupti
-                  maxime facilis iste obcaecati exercitationem vel facere magnam
-                  doloremque libero, voluptas atque sed aspernatur blanditiis.
-                  Cum sit debitis, dolorum obcaecati accusantium officiis
-                  sapiente labore veritatis possimus incidunt quasi magni
-                  explicabo. Corporis magni alias iure sint, sapiente vel ipsa
-                  doloribus. Labore alias laboriosam sapiente molestiae harum
-                  ullam architecto fugit in suscipit sit! Repellendus architecto
-                  ratione dignissimos impedit. In consectetur reprehenderit
-                  similique ipsum hic eos quibusdam beatae dignissimos eum.
-                  Repellendus illo voluptas quo eius alias, ducimus veritatis
-                  perspiciatis voluptates consequuntur nobis cumque ipsa
-                  voluptatum enim vitae rem modi omnis. Perferendis nesciunt
-                  omnis non totam. Ipsa velit dolore exercitationem iste quia,
-                  laboriosam aperiam maxime iure porro doloribus minus odio
-                  assumenda, cupiditate possimus dicta, fugiat consequuntur
-                  animi delectus! Minus eaque esse, omnis velit rerum alias
-                  dolores doloremque obcaecati voluptatem fugit voluptate vero
-                  eligendi quasi accusantium ea. Sed reprehenderit molestias
-                  autem nam tenetur magnam consequatur voluptatum enim dolores
-                  earum inventore quaerat temporibus molestiae magni, ea et quae
-                  ducimus suscipit tempora dolorem non maxime unde?
-                  Necessitatibus ullam eum praesentium iure eius ex quaerat,
-                  maxime soluta vel aliquid. Animi exercitationem nisi ducimus,
-                  asperiores, modi totam, numquam saepe quae ab placeat vitae
-                  inventore!
-                </p>
-              </div>
-            </div>
-            <div class="flex justify-between">
-              <p class="text-[#EAAD1E] font-semibold">
-                Kata Kunci:
-                <span class="text-black">
-                  classification, bagging, k-nearest neighbor (knn).</span
-                >
-              </p>
-              <p class="text-[#EAAD1E] font-semibold">
-                Tahun: <span class="text-black">2023</span>
-              </p>
-            </div>
-          </div>
+          {% endfor %}
+          
+          
+
+
         </div>
       </div>
     </div>
   </body>
 </html>
+
+
+
+
+

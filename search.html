@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/style.css') }}" />
   </head>
   <body class="font-sans">
     <div class="w-screen h-screen">
@@ -106,7 +106,7 @@
           <li>
             <a
               class="text-base font-bold text-[#eaad1e] border-b-4 rounded-sm border-transparent hover:border-[#004b8f] transition pb-1"
-              href="index.html"
+              href="{{ url_for('index') }}"
               >Home</a
             >
           </li>
@@ -129,7 +129,7 @@
           <li>
             <a
               class="text-base font-bold text-[#eaad1e] border-b-4 rounded-sm border-transparent hover:border-[#004b8f] transition pb-1"
-              href="search.html"
+              href="{{ url_for('search_ta') }}"
               >Pencarian Penelitian</a
             >
           </li>
@@ -162,7 +162,7 @@
         <div class="w-1/2 h-full flex flex-col items-center">
           <div class="mt-9 ml-5 max-h-40">
             <img
-              src="assets/images/logo.png"
+              src="{{ url_for('static', filename='assets/images/logo.png') }}"
               alt=""
               class="h-auto w-auto max-h-full max-w-full object-contain"
             />
@@ -174,7 +174,7 @@
             </h4>
           </div>
           <div class="w-full mt-6">
-            <form class="max-w-md mx-auto">
+            <form class="max-w-md mx-auto" action="{{ url_for('hasil_search_ta') }}" method="post">
               <label
                 for="default-search"
                 class="mb-2 text-sm font-medium text-gray-900 sr-only"
@@ -203,6 +203,7 @@
                 <input
                   type="search"
                   id="default-search"
+                  name="judul"
                   class="block w-full p-4 ps-10 text-sm font-semibold text-[#004B8F] border border-gray-300 rounded-full bg-[#D9D9D9] focus:outline-none"
                   placeholder="Cari Rekomendasi......"
                   required
