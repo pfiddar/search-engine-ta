@@ -1,75 +1,121 @@
 import flask
 import pandas as pd
 import nltk
+import string
+import math
 from nltk.tokenize import word_tokenize
-from nltk.stem import PorterStemmer
+from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from flask import request
+from flask import request, render_template, redirect, url_for
+from flask_mysqldb import MySQL
+from flask_caching import Cache
 
-app = flask.Flask(__name__, template_folder='./')
+app = flask.Flask(__name__, template_folder='templates')
+cache = Cache(app)
 
+# Configure MySQL
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = ''
+app.config['MYSQL_DB'] = 'stki'
+
+app.config['CACHE_TYPE'] = 'simple'
+cache = Cache(app)
+
+mysql = MySQL(app)
+
+# Download necessary NLTK data
+nltk.download('punkt')
+nltk.download('stopwords')
+
+# Initialize Stemmer and stopwords
+factory = StemmerFactory()
+stemmer = factory.create_stemmer()
+stop_words = set(stopwords.words('indonesian'))
+
+@cache.memoize(timeout=250)  # Cache results for 5 minutes
+def preprocess_text(text):
+    text = text.lower()
+    text = text.translate(str.maketrans('', '', string.punctuation))
+    tokens = word_tokenize(text)
+    tokens = [stemmer.stem(word) for word in tokens if word.isalpha() and word not in stop_words]
+    return ' '.join(tokens)
 
 @app.route('/')
 def index():
-    return(flask.render_template('index.html'))
+    return render_template('index.html')
 
 @app.route('/search')
 def search_ta():
-    return(flask.render_template('search.html'))
+    return render_template('search.html')
 
-@app.route('/hasil_search', methods=['POST'])
+@app.route('/hasil_search', methods=['GET', 'POST'])
 def hasil_search_ta():
-    # Load your dataset
+    if request.method == 'POST':
+        title = request.form['judul']
+        return redirect(url_for('hasil_search_ta', judul=title))
+    
+    title = request.args.get('judul')
+    if not title:
+        return redirect(url_for('search_ta'))
+
+    # Load dataset
     df = pd.read_csv('dataset_ta.csv')
 
-    # Preprocess the data
-    nltk.download('punkt')
-    nltk.download('stopwords')
+    # Check if the documents table is empty
+    with mysql.connection.cursor() as cursor:
+        cursor.execute("SELECT COUNT(*) FROM documents")
+        doc_count = cursor.fetchone()[0]
 
-    def preprocess_text(text):
-        # Tokenize the text
-        tokens = word_tokenize(text)
-        
-        # Remove stop words
-        stop_words = set(stopwords.words('indonesian'))
-        tokens = [token for token in tokens if token not in stop_words]
-        
-        # Stem the tokens
-        stemmer = PorterStemmer()
-        tokens = [stemmer.stem(token) for token in tokens]
-        
-        return ' '.join(tokens)
+        if doc_count == 0:
+            # Store documents in the database only if the table is empty
+            try:
+                for index, row in df.iterrows():
+                    cursor.execute("INSERT INTO documents (judul, penulis, tahun, deskripsi, tautan, kata_kunci) VALUES (%s, %s, %s, %s, %s, %s)",
+                                   (row['judul'], row['penulis'], row['tahun'], row['deskripsi'], row['tautan'], row['kata_kunci']))
+                mysql.connection.commit()
+            except Exception as e:
+                mysql.connection.rollback()
+                print(f"Error inserting documents: {e}")
 
-    # Apply the preprocessing function to each title
-    df['judul'] = df['judul'].apply(preprocess_text)
+    # Preprocess the search title
+    preprocessed_title = preprocess_text(title)
 
-    # Create a TF-IDF vectorizer
-    vectorizer = TfidfVectorizer()
+    @cache.memoize(timeout=300)  # Cache results for 5 minutes
+    def calculate_similarity(df, preprocessed_title):
+        # TF-IDF Vectorizer
+        vectorizer = TfidfVectorizer(max_features=1000)
+        tfidf = vectorizer.fit_transform(df['deskripsi'].apply(preprocess_text))
 
-    # Fit the vectorizer to the data and transform it
-    tfidf = vectorizer.fit_transform(df['judul'])
+        # Store words and their TF-IDF scores in the database
+        try:
+            with mysql.connection.cursor() as cursor:
+                cursor.execute("DELETE FROM word_document")
+                cursor.execute("DELETE FROM words")
+                
+                feature_names = vectorizer.get_feature_names_out()
+                for idx, word in enumerate(feature_names):
+                    cursor.execute("INSERT INTO words (word) VALUES (%s)", (word,))
+                    word_id = cursor.lastrowid
+                    for doc_idx, score in enumerate(tfidf[:, idx].toarray()):
+                        if score > 0:
+                            cursor.execute("INSERT INTO word_document (word_id, document_id, tfidf_score) VALUES (%s, %s, %s)",
+                                           (word_id, doc_idx + 1, score[0]))
+                mysql.connection.commit()
+        except Exception as e:
+            mysql.connection.rollback()
+            print(f"Error indexing words: {e}")
 
-    # Calculate the cosine similarity
-    similarity = cosine_similarity(tfidf)
+        title_vector = vectorizer.transform([preprocessed_title])
 
-    # Function to search for similar titles
-    def search_similar_titles(title, num_results=None):
-        # Preprocess the title
-        title = preprocess_text(title)
-        
-        # Get the TF-IDF vector for the title
-        title_vector = vectorizer.transform([title])
-        
-        # Calculate the similarity scores
+        # Calculate similarity scores
         scores = cosine_similarity(title_vector, tfidf)[0]
-        
-        # Get the indices of the similar titles
-        indices = scores.argsort()
-        
-        # Create a DataFrame of the similar titles
+        indices = scores.argsort()[::-1]
+
         similar_titles = pd.DataFrame({
+            'Index': df.index[indices].tolist(),
             'Judul': df['judul'].iloc[indices].tolist(),
             'Penulis': df['penulis'].iloc[indices].tolist(),
             'Tahun': df['tahun'].iloc[indices].tolist(),
@@ -78,40 +124,56 @@ def hasil_search_ta():
             'Kata_kunci': df['kata_kunci'].iloc[indices].tolist()
         })
 
-        # Filter the titles with similarity scores above 0.5
-        similar_titles = similar_titles[similar_titles['Judul'].apply(lambda x: scores[indices[similar_titles['Judul'].tolist().index(x)]] > 0.1)]
-
+        similar_titles = similar_titles[scores[indices] > 0]  # Remove the 0.1 threshold
         return similar_titles
 
-    # Example usage
-    title = request.form['judul']
-    similar_titles = search_similar_titles(title)
+    similar_titles = calculate_similarity(df, preprocessed_title)
+
+    # Pagination
+    page = request.args.get('page', 1, type=int)
+    per_page = 8
+    total_pages = math.ceil(len(similar_titles) / per_page)
+    start = (page - 1) * per_page
+    end = start + per_page
 
     data = []
-
-    for index, row in similar_titles.iterrows():
-        data.append({'judul': row['Judul'], 'penulis': row['Penulis'], 'tahun': row['Tahun'], 'deskripsi': row['Deskripsi'], 'tautan': row['Tautan'], 'kata_kunci': row['Kata_kunci']})
+    for index, row in similar_titles[start:end].iterrows():
+        data.append({
+            'index': row['Index'],
+            'judul': row['Judul'],
+            'penulis': row['Penulis'],
+            'tahun': row['Tahun'],
+            'deskripsi': row['Deskripsi'],
+            'tautan': row['Tautan'],
+            'kata_kunci': row['Kata_kunci']
+        })
 
     jumlah_baris = len(similar_titles)
-    
-    # Kirim hasil ke template HTML
-    return flask.render_template('output.html', result_searching=data, jumlah_baris=jumlah_baris)
 
-@app.route('/output.html', methods=['GET'])
-def output_ta():
-    return(flask.render_template('output.html'))
+    return render_template('output.html', 
+                           result_searching=data, 
+                           jumlah_baris=jumlah_baris, 
+                           page=page, 
+                           total_pages=total_pages,
+                           title=title)
+                           
+@app.route('/detail/<int:index>', methods=['GET'])
+def detail_ta(index):
+    df = pd.read_csv('dataset_ta.csv')
+    if index >= len(df) or index < 0:
+        return "Index out of range", 404
 
+    detail_data = {
+        'judul': df.loc[index, 'judul'],
+        'penulis': df.loc[index, 'penulis'],
+        'tahun': df.loc[index, 'tahun'],
+        'deskripsi': df.loc[index, 'deskripsi'],
+        'tautan': df.loc[index, 'tautan'],
+        'kata_kunci': df.loc[index, 'kata_kunci']
+    }
+
+    return render_template('detail.html', detail_data=detail_data)
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-
-
-
-
-
-
-
-
 

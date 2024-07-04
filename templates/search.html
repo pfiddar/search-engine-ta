@@ -5,10 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/style.css') }}" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='assets/css/style.css') }}"
+    />
   </head>
   <body class="font-sans">
-    <div class="">
+    <div class="w-screen h-screen">
       <nav
         class="relative px-4 py-4 flex justify-between items-center bg-[#EAEAEA]"
       >
@@ -106,7 +109,7 @@
           <li>
             <a
               class="text-base font-bold text-[#eaad1e] border-b-4 rounded-sm border-transparent hover:border-[#004b8f] transition pb-1"
-              href="index.html"
+              href="{{ url_for('index') }}"
               >Home</a
             >
           </li>
@@ -158,88 +161,73 @@
           </svg>
         </button>
       </nav>
-      <div class="px-3 py-3">
-        <div class="w-full h-20 flex justify-between items-center">
-          <div class="">
+      <div class="flex flex-grow justify-center h-5/6">
+        <div class="w-1/2 h-full flex flex-col items-center">
+          <div class="mt-9 ml-5 max-h-40">
             <img
               src="{{ url_for('static', filename='assets/images/logo.png') }}"
               alt=""
-              class="h-14 w-14 object-contain"
+              class="h-auto w-auto max-h-full max-w-full object-contain"
             />
           </div>
-          <div class="flex-grow ml-2">
-            <form class="flex items-center mx-auto" action="{{ url_for('hasil_search_ta') }}" method="post">
-              <label for="simple-search" class="sr-only">Search</label>
-              <div class="relative w-full">
+          <div class="mt-12">
+            <h4 class="italic text-lg font-semibold text-center">
+              Seacrh Engine Tugas Akhir Teknik Informatika <br />
+              Universitas Muhammadiyah Jember
+            </h4>
+          </div>
+          <div class="w-full mt-6">
+            <form
+              class="max-w-md mx-auto"
+              action="{{ url_for('hasil_search_ta') }}"
+              method="post"
+            >
+              <label
+                for="default-search"
+                class="mb-2 text-sm font-medium text-gray-900 sr-only"
+                >Search</label
+              >
+              <div class="relative">
                 <div
                   class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none"
-                ></div>
+                >
+                  <svg
+                    class="w-4 h-4 text-gray-50"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                    ></path>
+                  </svg>
+                </div>
                 <input
-                  type="text"
-                  id="simple-search"
+                  type="search"
+                  id="default-search"
                   name="judul"
-                  class="w-full h-12 bg-[#D9D9D9] border font-semibold text-sm rounded-full focus:outline-none block p-2.5"
-                  placeholder="Pencarian Judul Penelitian"
+                  class="block w-full p-4 ps-10 text-sm font-semibold text-[#004B8F] border border-gray-300 rounded-full bg-[#D9D9D9] focus:outline-none"
+                  placeholder="Cari Tugas Akhir......"
                   required
                 />
               </div>
+              <div class="w-full text-center mt-4">
+                <button
+                  type="submit"
+                  class="text-center text-[#004B8F] bg-[#eaad1e] focus:ring-4 focus:outline-none focus:ring-blue-300 font-bold rounded-full text-sm px-8 py-4"
+                >
+                  Cari Penelitian
+                </button>
+              </div>
             </form>
           </div>
-          <div>
-            <button
-              type="submit"
-              class="p-2.5 h-12 ms-2 text-sm font-medium text-[#004B8F] bg-[#EAAD1E] rounded-full"
-            >
-              <span>Cari Penelitian</span>
-            </button>
-          </div>
-        </div>
-      </div>
-      <h2 class="px-4 font-bold text-lg text-[#EAAD1E] tracking-wide">
-        Hasil Pencarian :
-        <span class="text-black"
-          >Ditemukan <span class="text-[#EAAD1E]">{{ jumlah_baris }}</span> dokumen yang sesuai
-          dengan query</span
-        >
-      </h2>
-      <div class="px-36 py-2">
-        <div class=""></div>
-        <div class="mt-2 flex flex-col">
-          {% for row in result_searching %}
-          <div class="border-b-2 border-[#EAAD1E] rounded-sm py-8 flex gap-8 flex-col max-w-full">
-            <div class="flex gap-4">
-              <img src="{{ url_for('static', filename='assets/images/image.png') }}" alt="Gambar" class="w-28" />
-              <div class="">
-                <h1 class="hover:cursor-pointer underline hover:text-black hover:no-underline text-lg font-extrabold text-[#004B8F]">
-                  {{ row.judul }}
-                </h1>
-                <p class="line-clamp-4">
-                  {{ row.deskripsi }}
-                </p>
-              </div>
-            </div>
-            <div class="flex justify-between">
-              <p class="text-[#EAAD1E] font-semibold">
-                Kata Kunci:
-                <span class="text-black">{{ row.kata_kunci }}</span>
-              </p>
-              <p class="text-[#EAAD1E] font-semibold">
-                Tahun: <span class="text-black">{{ row.tahun }}</span>
-              </p>
-            </div>
-          </div>
-          {% endfor %}
-          
-          
-
-
         </div>
       </div>
     </div>
   </body>
 </html>
-
-
-
-
-

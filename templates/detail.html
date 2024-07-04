@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Detail</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/style.css') }}" />
+    <link rel="stylesheet" href="assets/css/style.css" />
   </head>
-  <body class="font-sans">
-    <div class="w-screen h-screen">
+  <body class="font-sans flex flex-col min-h-screen">
+    <div class="flex-grow">
       <nav
         class="relative px-4 py-4 flex justify-between items-center bg-[#EAEAEA]"
       >
@@ -158,69 +158,55 @@
           </svg>
         </button>
       </nav>
-      <div class="flex flex-grow justify-center h-5/6">
-        <div class="w-1/2 h-full flex flex-col items-center">
-          <div class="mt-9 ml-5 max-h-40">
-            <img
-              src="{{ url_for('static', filename='assets/images/logo.png') }}"
-              alt=""
-              class="h-auto w-auto max-h-full max-w-full object-contain"
-            />
-          </div>
-          <div class="mt-12">
-            <h4 class="italic text-lg font-semibold text-center">
-              Sistem Rekomendasi Tugas Akhir Teknik Informatika <br />
-              Universitas Muhammadiyah Jember
-            </h4>
-          </div>
-          <div class="w-full mt-6">
-            <form class="max-w-md mx-auto" action="{{ url_for('hasil_search_ta') }}" method="post">
-              <label
-                for="default-search"
-                class="mb-2 text-sm font-medium text-gray-900 sr-only"
-                >Search</label
-              >
-              <div class="relative">
-                <div
-                  class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none"
-                >
-                  <svg
-                    class="w-4 h-4 text-gray-50"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      stroke="currentColor"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-                    ></path>
-                  </svg>
-                </div>
-                <input
-                  type="search"
-                  id="default-search"
-                  name="judul"
-                  class="block w-full p-4 ps-10 text-sm font-semibold text-[#004B8F] border border-gray-300 rounded-full bg-[#D9D9D9] focus:outline-none"
-                  placeholder="Cari Rekomendasi......"
-                  required
-                />
+      <div class="flex flex-col pb-4 px-16">
+        <div
+          class="border-b-4 border-[#EAAD1E] rounded-sm py-4 flex gap-8 flex-col max-w-full"
+        >
+          <div class="flex gap-4">
+            <div class="w-[14%]">
+              <img
+                src="{{ url_for('static', filename='assets/images/image.png') }}"
+                alt="Gambar"
+                class="w-full bg-auto"
+              />
+              <div class="ml-2 flex flex-col">
+                <p class="text-[#EAAD1E] font-semibold text-sm mt-3 mb-2">
+                  Oleh:
+                  <span class="text-black">{{ detail_data.penulis }}</span>
+                </p>
+                <p class="text-[#EAAD1E] font-semibold text-sm">
+                  Tahun: <span class="text-black">{{ detail_data.tahun }}</span>
+                </p>
               </div>
-              <div class="w-full text-center mt-4">
-                <button
-                  type="submit"
-                  class="text-center text-[#004B8F] bg-[#eaad1e] focus:ring-4 focus:outline-none focus:ring-blue-300 font-bold rounded-full text-sm px-8 py-4"
+            </div>
+            <div class="w-[86%]">
+              <h1 class="text-lg font-extrabold text-[#004B8F]">
+                {{ detail_data.judul }}
+              </h1>
+              <p class="text-[#EAAD1E] font-semibold mt-3 mb-1">
+                Kata Kunci:
+                <span class="text-black">{{ detail_data.kata_kunci }}</span>
+              </p>
+              <p>{{ detail_data.deskripsi }}</p>
+              <div class="w-full text-left mt-4">
+                <a
+                  href="{{ detail_data.tautan }}"
+                  class="text-center transition-all duration-500 hover:text-[#004B8F] text-[#eaad1e] hover:bg-[#eaad1e] border-2 border-dashed border-[#eaad1e] font-bold rounded-xl text-sm px-6 py-3"
                 >
-                  Cari Penelitian
-                </button>
+                  PDF
+                </a>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       </div>
     </div>
+    <footer
+      class="flex items-center bg-gray-700 h-14 px-4 mt-auto bottom-0 w-full"
+    >
+      <p class="text-left ml-12 text-white">
+        &copy; 2024, Universitas Muhammadiyah Jember Teknik Informatika Library
+      </p>
+    </footer>
   </body>
 </html>

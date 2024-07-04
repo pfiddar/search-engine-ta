@@ -695,8 +695,7 @@ untuk menprediksi jumlah wisatawan yang akan datang ke Bali. Data yang digunakan
 merupakan data wisatawan domestik ke Bali dari 2019-2022. Berdasarkan pengujian yang
 dilakukan didapatkan hasil prediksi jumlah wisatawan yaitu sebesar 706.175 dengan nilai
 MAPE yang diperoleh yaitu 31%.",https://drive.google.com/file/d/1UbwTuLa6q9l73PdrJG_eNWjZLUQv8Ft4/view?usp=sharing,"wisatawan, bali, fuzzy, time series chen, prediksi."
-ibrahim nagib,"klasifikasi penyakit paru-paru menggunakan metode cnn arsitektur mobilenet versi 3
-",2023,"Penyakit paru-paru, termasuk covid-19, tuberkulosis, dan pneumonia
+ibrahim nagib,klasifikasi penyakit paru-paru menggunakan metode cnn arsitektur mobilenet versi 3,2023,"Penyakit paru-paru, termasuk covid-19, tuberkulosis, dan pneumonia
 adalah beberapa penyakit yang paling sering terjadi dan mematikan di seluruh
 dunia. Salah satu metode utama untuk mendiagnosis penyakit paru-paru adalah
 melalui pemeriksaan rontgen dada, namun interpretasi citra rontgen memerlukan
@@ -780,7 +779,7 @@ Metode klasifikasi yang digunakan pada penelitian kali ini yaitu Gaussian Naïve
 Bayes dan menggunakan metode pendukung K-Fold Cross Validation. Hasil dari
 penelitian ini didapatkan akurasi sebesar 80%, dengan recall 100% dan presisi
 sebesar 66,67%.",https://drive.google.com/file/d/1HJl0Bee2qpe99nMPgR1vea16-XuYbR6n/view?usp=sharing,"klasifikasi atlet, gaussian naïve bayes, pencak silat."
-bagas pras priamboro,klasifikasi gagal jantung berdasarkanagejalaamenggunakanametode mknn (modifiedik-nearest neighbor),2023,"Gagal jantung kongestif atau yang dikenal juga terjadi saatiotot jantung tidak
+bagas pras priamboro,klasifikasi gagal jantung berdasarkan gejala menggunakan metode mknn (modifiedik-nearest neighbor),2023,"Gagal jantung kongestif atau yang dikenal juga terjadi saatiotot jantung tidak
 dapatimemompa darahidengan cukupikuat ke seluruh tubuh. Masalahikesehatan
 iniidulu dikenal sebagai pembunuh senyap atau pembunuh diam karena seringkali
 tidak menunjukkan gejala apa pun dan akhirnya menyebabkan kematian pasien..
