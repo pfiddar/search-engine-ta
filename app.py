@@ -1,4 +1,4 @@
-import flask
+from flask import Flask, request, render_template, redirect, url_for
 import pandas as pd
 import nltk
 import string
@@ -8,21 +8,17 @@ from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from flask import request, render_template, redirect, url_for
 from flask_mysqldb import MySQL
 from flask_caching import Cache
 
-app = flask.Flask(__name__, template_folder='templates')
-cache = Cache(app)
+app = Flask(__name__, template_folder='templates')
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 # Configure MySQL
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'stki'
-
-app.config['CACHE_TYPE'] = 'simple'
-cache = Cache(app)
+app.config['MYSQL_DB'] = 'ir'
 
 mysql = MySQL(app)
 
@@ -89,7 +85,6 @@ def hasil_search_ta():
         vectorizer = TfidfVectorizer(max_features=1000)
         tfidf = vectorizer.fit_transform(df['deskripsi'].apply(preprocess_text))
 
-        # Store words and their TF-IDF scores in the database
         try:
             with mysql.connection.cursor() as cursor:
                 cursor.execute("DELETE FROM word_document")
@@ -112,6 +107,18 @@ def hasil_search_ta():
 
         # Calculate similarity scores
         scores = cosine_similarity(title_vector, tfidf)[0]
+
+        # Tambahkan bobot ekstra berdasarkan umpan balik relevansi
+        try:
+            with mysql.connection.cursor() as cursor:
+                cursor.execute("SELECT document_id FROM relevance_feedback WHERE query = %s", (preprocessed_title,))
+                relevant_docs = cursor.fetchall()
+                relevant_docs = [doc[0] for doc in relevant_docs]
+                for doc_id in relevant_docs:
+                    scores[doc_id - 1] *= 1.5  
+        except Exception as e:
+            print(f"Error processing relevance feedback: {e}")
+
         indices = scores.argsort()[::-1]
 
         similar_titles = pd.DataFrame({
@@ -156,7 +163,7 @@ def hasil_search_ta():
                            page=page, 
                            total_pages=total_pages,
                            title=title)
-                           
+
 @app.route('/detail/<int:index>', methods=['GET'])
 def detail_ta(index):
     df = pd.read_csv('dataset_ta.csv')
@@ -174,6 +181,28 @@ def detail_ta(index):
 
     return render_template('detail.html', detail_data=detail_data)
 
+@app.route('/relevance_feedback', methods=['POST'])
+def relevance_feedback():
+    relevant_docs = request.form.getlist('relevant_docs')
+    irrelevant_docs = request.form.getlist('irrelevant_docs')
+    query = request.form['query']
+
+    if not relevant_docs and not irrelevant_docs:
+        return redirect(url_for('hasil_search_ta', judul=query))
+
+    try:
+        with mysql.connection.cursor() as cursor:
+            for doc_id in relevant_docs:
+                cursor.execute("INSERT INTO relevance_feedback (query, document_id, relevance) VALUES (%s, %s, %s)", (query, doc_id, 1))
+            for doc_id in irrelevant_docs:
+                cursor.execute("INSERT INTO relevance_feedback (query, document_id, relevance) VALUES (%s, %s, %s)", (query, doc_id, 0))
+            mysql.connection.commit()
+    except Exception as e:
+        mysql.connection.rollback()
+        print(f"Error saving relevance feedback: {e}")
+
+    return redirect(url_for('hasil_search_ta', judul=query))
+
+
 if __name__ == '__main__':
     app.run(debug=True)
-

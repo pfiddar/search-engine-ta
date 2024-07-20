@@ -206,39 +206,77 @@
             yang sesuai dengan query
           </span>
         </h2>
-        <div class="mt-2 flex flex-col">
-          {% for row in result_searching %}
-          <div
-            class="border-b-2 border-[#EAAD1E] rounded-sm py-8 flex gap-8 flex-col max-w-full"
-          >
-            <div class="flex gap-4">
-              <img
-                src="{{ url_for('static', filename='assets/images/image.png') }}"
-                alt="Gambar"
-                class="w-28"
-              />
-              <div>
-                <a href="{{ url_for('detail_ta', index=row.index) }}">
-                  <h1
+        <form
+          action="{{ url_for('relevance_feedback') }}"
+          method="post"
+          class="mt-4"
+        >
+          <div class="flex flex-col">
+            {% for result in result_searching %}
+            <div
+              class="result border-b-2 border-[#EAAD1E] rounded-sm py-8 flex flex-col max-w-full"
+            >
+              <div class="flex">
+                <img
+                  src="{{ url_for('static', filename='assets/images/image.png') }}"
+                  alt="Gambar"
+                  class="w-28"
+                />
+                <div class="ml-2">
+                  <a
+                    href="{{ url_for('detail_ta', index=result.index) }}"
                     class="hover:cursor-pointer underline hover:text-black hover:no-underline text-lg font-extrabold text-[#004B8F]"
                   >
-                    {{ row.judul }}
-                  </h1>
-                </a>
-                <p class="line-clamp-4">{{ row.deskripsi }}</p>
+                    <h1>{{ result.judul }}</h1>
+                  </a>
+                  <p class="line-clamp-4">{{ result.deskripsi }}</p>
+                </div>
+              </div>
+              <div class="flex justify-between mt-4">
+                <div class="flex items-center font-semibold">
+                  <p class="text-[#EAAD1E] mr-2">Kata Kunci:</p>
+                  <span class="text-black">{{ result.kata_kunci }}</span>
+                </div>
+                <div class="flex items-center font-semibold">
+                  <p class="text-[#EAAD1E] mr-2">Tahun:</p>
+                  <span class="text-black">{{ result.tahun }}</span>
+                </div>
+              </div>
+              <div class="flex mt-4">
+                <label class="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    name="relevant_docs"
+                    value="{{ result.index }}"
+                    class="form-checkbox text-[#004b8f]"
+                  />
+                  <span class="text-[#004b8f] font-semibold">Relevan</span>
+                </label>
+                <label class="flex items-center gap-1 ml-5">
+                  <input
+                    type="checkbox"
+                    name="irrelevant_docs"
+                    value="{{ result.index }}"
+                    class="form-checkbox text-red-600"
+                  />
+                  <span class="text-red-600 font-semibold">Tidak Relevan</span>
+                </label>
               </div>
             </div>
-            <div class="flex justify-between">
-              <p class="text-[#EAAD1E] font-semibold">
-                Kata Kunci: <span class="text-black">{{ row.kata_kunci }}</span>
-              </p>
-              <p class="text-[#EAAD1E] font-semibold">
-                Tahun: <span class="text-black">{{ row.tahun }}</span>
-              </p>
-            </div>
+            {% endfor %}
           </div>
-          {% endfor %}
-        </div>
+          <input type="hidden" name="query" value="{{ title }}" />
+          <div class="mt-6">
+            <button
+              type="submit"
+              id="submitFeedback"
+              class="p-2.5 w-36 h-12 text-sm font-medium text-white bg-[#004B8F] rounded-full hover:bg-[#002f4b] transition"
+              style="display: none"
+            >
+              Kirim Umpan Balik
+            </button>
+          </div>
+        </form>
       </div>
       <div class="flex justify-center mt-4 mb-5">
         <nav>
@@ -278,5 +316,6 @@
         &copy; 2024, Universitas Muhammadiyah Jember Teknik Informatika Library
       </p>
     </footer>
+    <script src="{{ url_for('static', filename='assets/js/checklist.js') }}"></script>
   </body>
 </html>
