@@ -18,7 +18,7 @@ cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'ir'
+app.config['MYSQL_DB'] = 'stki'
 
 mysql = MySQL(app)
 
