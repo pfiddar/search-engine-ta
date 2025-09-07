@@ -39,8 +39,7 @@ stop_words = set(stopwords.words('indonesian'))
 def safe_stem(word):
     try:
         return stemmer.stem(word)
-    except Exception as e:
-        print(f"[Warning] Stemming error for '{word}': {e}")
+    except Exception:
         return word
 
 @cache.memoize(timeout=250)  # Cache results for 5 minutes
