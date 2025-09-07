@@ -8,6 +8,8 @@ from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+import pymysql
+pymysql.install_as_MySQLdb()
 from flask_mysqldb import MySQL
 from flask_caching import Cache
 
