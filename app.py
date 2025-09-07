@@ -23,6 +23,12 @@ app.config['MYSQL_DB'] = os.getenv('MYSQLDATABASE')
 app.config['MYSQL_PORT'] = int(os.getenv('MYSQLPORT', 10724))
 app.config['pymysql_kwargs'] = {}
 
+print("DB CONFIG:",
+      app.config['MYSQL_HOST'],
+      app.config['MYSQL_USER'],
+      app.config['MYSQL_DB'],
+      app.config['MYSQL_PORT'])
+
 mysql = MySQL(app)
 
 # Download necessary NLTK data
