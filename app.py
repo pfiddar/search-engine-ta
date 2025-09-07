@@ -36,12 +36,19 @@ factory = StemmerFactory()
 stemmer = factory.create_stemmer()
 stop_words = set(stopwords.words('indonesian'))
 
+def safe_stem(word):
+    try:
+        return stemmer.stem(word)
+    except Exception as e:
+        print(f"[Warning] Stemming error for '{word}': {e}")
+        return word
+
 @cache.memoize(timeout=250)  # Cache results for 5 minutes
 def preprocess_text(text):
     text = text.lower()
     text = text.translate(str.maketrans('', '', string.punctuation))
     tokens = word_tokenize(text)
-    tokens = [stemmer.stem(word) for word in tokens if word.isalpha() and word not in stop_words]
+    tokens = [safe_stem.stem(word) for word in tokens if word.isalpha() and word not in stop_words]
     return ' '.join(tokens)
 
 @app.route('/')
