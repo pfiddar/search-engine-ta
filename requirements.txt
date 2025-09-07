@@ -25,4 +25,3 @@ tqdm==4.67.1
 tzdata==2025.2
 Werkzeug==3.1.3
 PyMySQL==1.1.0
-Flask-PyMySQL==0.2.4

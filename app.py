@@ -9,28 +9,23 @@ from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from flask_pymysql import MySQL
 from flask_caching import Cache
 
 app = Flask(__name__, template_folder='templates')
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 # Configure MySQL
-app.config['MYSQL_HOST'] = os.getenv("MYSQLHOST")
-app.config['MYSQL_USER'] = os.getenv("MYSQLUSER")
-app.config['MYSQL_PASSWORD'] = os.getenv("MYSQLPASSWORD")
-app.config['MYSQL_DB'] = os.getenv("MYSQLDATABASE")
-app.config['MYSQL_PORT'] = int(os.getenv("MYSQLPORT"))
-app.config['pymysql_kwargs'] = {}
+def get_connection():
+    return pymysql.connect(
+        host=os.getenv("MYSQLHOST"),
+        port=int(os.getenv("MYSQLPORT", 10724)),
+        user=os.getenv("MYSQLUSER"),
+        password=os.getenv("MYSQLPASSWORD"),
+        database=os.getenv("MYSQLDATABASE"),
+        cursorclass=pymysql.cursors.Cursor
+    )
 
-mysql = MySQL(app)
-
-print("=== DB CONFIG DEBUG ===")
-print("HOST:", app.config['MYSQL_HOST'])
-print("USER:", app.config['MYSQL_USER'])
-print("DB:", app.config['MYSQL_DB'])
-print("PORT:", app.config['MYSQL_PORT'])
-print("=======================")
+conn = get_connection()
 
 # Download necessary NLTK data
 nltk.download('punkt')
@@ -71,7 +66,7 @@ def hasil_search_ta():
     df = pd.read_csv('dataset_ta.csv')
 
     # Check if the documents table is empty
-    with mysql.connection.cursor() as cursor:
+    with conn.cursor() as cursor:
         cursor.execute("SELECT COUNT(*) FROM documents")
         doc_count = cursor.fetchone()[0]
 
@@ -81,9 +76,9 @@ def hasil_search_ta():
                 for index, row in df.iterrows():
                     cursor.execute("INSERT INTO documents (judul, penulis, tahun, deskripsi, tautan, kata_kunci) VALUES (%s, %s, %s, %s, %s, %s)",
                                    (row['judul'], row['penulis'], row['tahun'], row['deskripsi'], row['tautan'], row['kata_kunci']))
-                mysql.connection.commit()
+                conn.commit()
             except Exception as e:
-                mysql.connection.rollback()
+                conn.rollback()
                 print(f"Error inserting documents: {e}")
 
     # Preprocess the search title
@@ -96,7 +91,7 @@ def hasil_search_ta():
         tfidf = vectorizer.fit_transform(df['deskripsi'].apply(preprocess_text))
 
         try:
-            with mysql.connection.cursor() as cursor:
+            with conn.cursor() as cursor:
                 cursor.execute("DELETE FROM word_document")
                 cursor.execute("DELETE FROM words")
                 
@@ -108,9 +103,9 @@ def hasil_search_ta():
                         if score > 0:
                             cursor.execute("INSERT INTO word_document (word_id, document_id, tfidf_score) VALUES (%s, %s, %s)",
                                            (word_id, doc_idx + 1, score[0]))
-                mysql.connection.commit()
+                conn.commit()
         except Exception as e:
-            mysql.connection.rollback()
+            conn.rollback()
             print(f"Error indexing words: {e}")
 
         title_vector = vectorizer.transform([preprocessed_title])
@@ -120,7 +115,7 @@ def hasil_search_ta():
 
         # Tambahkan bobot ekstra berdasarkan umpan balik relevansi
         try:
-            with mysql.connection.cursor() as cursor:
+            with conn.cursor() as cursor:
                 cursor.execute("SELECT document_id FROM relevance_feedback WHERE query = %s", (preprocessed_title,))
                 relevant_docs = cursor.fetchall()
                 relevant_docs = [doc[0] for doc in relevant_docs]
@@ -201,14 +196,14 @@ def relevance_feedback():
         return redirect(url_for('hasil_search_ta', judul=query))
 
     try:
-        with mysql.connection.cursor() as cursor:
+        with conn.cursor() as cursor:
             for doc_id in relevant_docs:
                 cursor.execute("INSERT INTO relevance_feedback (query, document_id, relevance) VALUES (%s, %s, %s)", (query, doc_id, 1))
             for doc_id in irrelevant_docs:
                 cursor.execute("INSERT INTO relevance_feedback (query, document_id, relevance) VALUES (%s, %s, %s)", (query, doc_id, 0))
-            mysql.connection.commit()
+            conn.commit()
     except Exception as e:
-        mysql.connection.rollback()
+        conn.rollback()
         print(f"Error saving relevance feedback: {e}")
 
     return redirect(url_for('hasil_search_ta', judul=query))
