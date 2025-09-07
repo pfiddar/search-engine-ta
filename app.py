@@ -16,11 +16,11 @@ app = Flask(__name__, template_folder='templates')
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 # Configure MySQL
-app.config['MYSQL_HOST'] = os.getenv('MYSQLHOST')
-app.config['MYSQL_USER'] = os.getenv('MYSQLUSER')
-app.config['MYSQL_PASSWORD'] = os.getenv('MYSQLPASSWORD')
-app.config['MYSQL_DB'] = os.getenv('MYSQLDATABASE')
-app.config['MYSQL_PORT'] = int(os.getenv('MYSQLPORT', 10724))
+app.config['MYSQL_HOST'] = os.getenv("MYSQLHOST")
+app.config['MYSQL_USER'] = os.getenv("MYSQLUSER")
+app.config['MYSQL_PASSWORD'] = os.getenv("MYSQLPASSWORD")
+app.config['MYSQL_DB'] = os.getenv("MYSQLDATABASE")
+app.config['MYSQL_PORT'] = int(os.getenv("MYSQLPORT"))
 app.config['pymysql_kwargs'] = {}
 
 mysql = MySQL(app)
