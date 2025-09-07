@@ -16,14 +16,21 @@ app = Flask(__name__, template_folder='templates')
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 # Configure MySQL
-app.config['MYSQL_HOST'] = os.getenv('MYSQLHOST', 'shuttle.proxy.rlwy.net')
-app.config['MYSQL_USER'] = os.getenv('MYSQLUSER', 'root')
-app.config['MYSQL_PASSWORD'] = os.getenv('MYSQLPASSWORD', 'tCWCmNrDZdreGkrJvRuVaxBKpaYfrJBD')
-app.config['MYSQL_DB'] = os.getenv('MYSQLDATABASE', 'stki')
+app.config['MYSQL_HOST'] = os.getenv('MYSQLHOST')
+app.config['MYSQL_USER'] = os.getenv('MYSQLUSER')
+app.config['MYSQL_PASSWORD'] = os.getenv('MYSQLPASSWORD')
+app.config['MYSQL_DB'] = os.getenv('MYSQLDATABASE')
 app.config['MYSQL_PORT'] = int(os.getenv('MYSQLPORT', 10724))
 app.config['pymysql_kwargs'] = {}
 
 mysql = MySQL(app)
+
+print("=== DB CONFIG DEBUG ===")
+print("HOST:", app.config['MYSQL_HOST'])
+print("USER:", app.config['MYSQL_USER'])
+print("DB:", app.config['MYSQL_DB'])
+print("PORT:", app.config['MYSQL_PORT'])
+print("=======================")
 
 # Download necessary NLTK data
 nltk.download('punkt')
