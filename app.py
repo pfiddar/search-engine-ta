@@ -3,6 +3,7 @@ import pandas as pd
 import nltk
 import string
 import math
+import os, pymysql
 from nltk.tokenize import word_tokenize
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from nltk.corpus import stopwords
@@ -10,7 +11,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from flask_pymysql import MySQL
 from flask_caching import Cache
-import os
 
 app = Flask(__name__, template_folder='templates')
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
@@ -22,12 +22,6 @@ app.config['MYSQL_PASSWORD'] = os.getenv('MYSQLPASSWORD')
 app.config['MYSQL_DB'] = os.getenv('MYSQLDATABASE')
 app.config['MYSQL_PORT'] = int(os.getenv('MYSQLPORT', 10724))
 app.config['pymysql_kwargs'] = {}
-
-print("DB CONFIG:",
-      app.config['MYSQL_HOST'],
-      app.config['MYSQL_USER'],
-      app.config['MYSQL_DB'],
-      app.config['MYSQL_PORT'])
 
 mysql = MySQL(app)
 
