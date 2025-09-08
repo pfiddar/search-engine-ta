@@ -56,7 +56,7 @@ def preprocess_text(text):
     text = text.lower()
     text = text.translate(str.maketrans('', '', string.punctuation))
     tokens = word_tokenize(text)
-    tokens = [safe_stem(word) for word in tokens if word.isalpha() and word not in stop_words]
+    tokens = [safe_stem(word, stemmer) for word in tokens if word.isalpha() and word not in stop_words]
     return ' '.join(tokens)
 
 @app.route('/')
