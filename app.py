@@ -42,6 +42,15 @@ def safe_stem(word):
     except Exception:
         return word
 
+def ensure_connection():
+    global conn
+    try:
+        conn.ping(reconnect=True)  # kalau masih nyambung aman
+    except:
+        conn = get_db_connection()  # kalau putus, bikin koneksi baru
+    return conn
+
+
 @cache.memoize(timeout=250)  # Cache results for 5 minutes
 def preprocess_text(text):
     text = text.lower()
@@ -72,6 +81,7 @@ def hasil_search_ta():
     df = pd.read_csv('dataset_ta.csv')
 
     # Check if the documents table is empty
+    conn = ensure_connection()
     with conn.cursor() as cursor:
         cursor.execute("SELECT COUNT(*) FROM documents")
         doc_count = cursor.fetchone()[0]
@@ -96,6 +106,7 @@ def hasil_search_ta():
         vectorizer = TfidfVectorizer(max_features=1000)
         tfidf = vectorizer.fit_transform(df['deskripsi'].apply(preprocess_text))
 
+        conn = ensure_connection()
         try:
             with conn.cursor() as cursor:
                 cursor.execute("DELETE FROM word_document")
@@ -120,6 +131,7 @@ def hasil_search_ta():
         scores = cosine_similarity(title_vector, tfidf)[0]
 
         # Tambahkan bobot ekstra berdasarkan umpan balik relevansi
+        conn = ensure_connection()
         try:
             with conn.cursor() as cursor:
                 cursor.execute("SELECT document_id FROM relevance_feedback WHERE query = %s", (preprocessed_title,))
@@ -201,6 +213,7 @@ def relevance_feedback():
     if not relevant_docs and not irrelevant_docs:
         return redirect(url_for('hasil_search_ta', judul=query))
 
+    conn = ensure_connection()
     try:
         with conn.cursor() as cursor:
             for doc_id in relevant_docs:
