@@ -36,10 +36,13 @@ factory = StemmerFactory()
 stemmer = factory.create_stemmer()
 stop_words = set(stopwords.words('indonesian'))
 
-def safe_stem(word):
+def safe_stem(word, stemmer):
     try:
         return stemmer.stem(word)
-    except Exception:
+    except SystemExit:
+        return word
+    except Exception as e:
+        print(f"Stemming error: {e}")
         return word
 
 def ensure_connection():
